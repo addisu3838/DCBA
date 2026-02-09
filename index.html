@@ -9,7 +9,7 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: auto;
         }
 
         :root {
@@ -165,7 +165,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background: blue;
                 linear-gradient(rgba(44, 62, 80, 0.7), rgba(52, 73, 94, 0.7)),
                 url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
             background-size: cover;
@@ -179,7 +179,7 @@
             text-align: left;
             color: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             position: relative;
@@ -197,25 +197,25 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 1px;
             background: linear-gradient(90deg, #27ae60, #3498db);
             z-index: 2;
         }
 
-        th:nth-child(1) { width: 8%; }  /* Item No */
-        th:nth-child(2) { width: 30%; } /* Work Description */
-        th:nth-child(3) { width: 12%; } /* Achievement */
-        th:nth-child(4) { width: 15%; } /* Income (Birr) */
-        th:nth-child(5) { width: 15%; } /* Income Total (Birr) */
-        th:nth-child(6) { width: 10%; } /* Status */
-        th:nth-child(7) { width: 10%; } /* Cost (Birr) - hidden by default */
+        th:nth-child(1) { width: 2%; }  /* Item No */
+        th:nth-child(2) { width: 20%; } /* Work Description */
+        th:nth-child(3) { width: 8%; } /* Achievement */
+        th:nth-child(4) { width: 8%; } /* Income (Birr) */
+        th:nth-child(5) { width: 9%; } /* Income Total (Birr) */
+        th:nth-child(6) { width: 7%; } /* Status */
+        th:nth-child(7) { width: 9%; } /* Cost (Birr) - hidden by default */
 
         td {
-            padding: 14px 15px;
-            border-bottom: 1px solid rgba(238, 238, 238, 0.7);
-            font-size: 14px;
+            padding: 11px 12px;
+            border-bottom: 1px solid rgba(141, 8, 8, 0.7);
+            font-size: 11px;
             font-weight: 500;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(233, 240, 143, 0.7);
             position: relative;
             z-index: 2;
         }
@@ -326,7 +326,7 @@
 
         .active-income {
             background: linear-gradient(135deg, rgba(39, 174, 96, 0.9), rgba(46, 204, 113, 0.9)) !important;
-            color: white !important;
+            color: rgb(202, 100, 100) !important;
             font-weight: 700 !important;
             box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
         }
@@ -360,7 +360,7 @@
             
             body {
                 padding: 0;
-                background: white !important;
+                background: rgb(201, 74, 74) !important;
             }
             
             .table-container {
@@ -374,11 +374,11 @@
             
             th, td {
                 border: 1px solid #000;
-                background: white !important;
+                background: rgb(127, 226, 135) !important;
             }
             
             .app-wrapper {
-                background: white !important;
+                background: rgb(126, 230, 149) !important;
                 box-shadow: none !important;
             }
         }
@@ -430,7 +430,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 0px;
             font-weight: bold;
             color: var(--primary);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -441,14 +441,14 @@
             position: absolute;
             width: 60%;
             height: 60%;
-            background: white;
+            background: rgb(214, 8, 8);
             border-radius: 50%;
         }
 
         .progress-bar span {
             position: relative;
             z-index: 1;
-            font-weight: 700;
+            font-weight: 300;
         }
 
         /* Toggle switch for cost/income view */
@@ -617,7 +617,8 @@
     <div class="app-wrapper">
         <header>
             <div class="header-title">
-                <h1>Construction Project Dashboard</h1>
+                <h1>Ajma Chacha Irrigation Project</h1>
+                <h1>Lot-3</h1>
                 <div class="header-subtitle">Official Construction Project Monitoring System</div>
             </div>
         </header>
@@ -891,7 +892,7 @@
                 description: " back Fill with shell material around the ditch", 
                 achievement:480, 
                 rate: "178.34", 
-                total: "85603.2", 
+                total: "4304.64", 
                 cost: "3,600",
                 status: "Pending" 
             }
