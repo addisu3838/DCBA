@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Progress Income & Cost</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --bg: #f4f7f6;
+            --text: #333;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --border: #eee;
+            --income-color: #27ae60;
+            --cost-color: #e74c3c;
+            --profit-color: #3498db;
+            --header-gradient: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            /* Background Image with Overlay */
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* Main Container */
+        .app-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Styles - Center aligned without summary row */
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 20px;
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
+                url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--secondary);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            z-index: 1;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-title h1 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Table Container */
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px 20px 20px 20px;
+            background: 
+                linear-gradient(rgba(249, 249, 249, 0.9), rgba(249, 249, 249, 0.9)),
+                url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Enhanced Table Header Styles */
+        .table-responsive {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            overflow-x: auto;
+            border: 1px solid rgba(238, 238, 238, 0.5);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-responsive::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)),
+                url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+
+        thead {
+            background: var(--header-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+
+        thead::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(rgba(44, 62, 80, 0.7), rgba(52, 73, 94, 0.7)),
+                url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        th {
+            padding: 16px 15px;
+            text-align: left;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 2;
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #27ae60, #3498db);
+            z-index: 2;
+        }
+
+        th:nth-child(1) { width: 8%; }  /* Item No */
+        th:nth-child(2) { width: 30%; } /* Work Description */
+        th:nth-child(3) { width: 12%; } /* Achievement */
+        th:nth-child(4) { width: 15%; } /* Income (Birr) */
+        th:nth-child(5) { width: 15%; } /* Income Total (Birr) */
+        th:nth-child(6) { width: 10%; } /* Status */
+        th:nth-child(7) { width: 10%; } /* Cost (Birr) - hidden by default */
+
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid rgba(238, 238, 238, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.7);
+            position: relative;
+            z-index: 2;
+        }
+
+        tr:hover {
+            background-color: rgba(248, 250, 252, 0.9);
+            transform: translateY(-1px);
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Badge Styles */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .status-active {
+            background-color: rgba(232, 245, 233, 0.9);
+            color: #2e7d32;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 243, 224, 0.9);
+            color: #ef6c00;
+        }
+
+        .status-completed {
+            background-color: rgba(227, 242, 253, 0.9);
+            color: #1565c0;
+        }
+
+        .status-started {
+            background-color: rgba(243, 229, 245, 0.9);
+            color: #7b1fa2;
+        }
+
+        /* Footer Tabs */
+        .excel-footer {
+            display: flex;
+            background: 
+                linear-gradient(rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95)),
+                url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 8px 10px;
+            gap: 2px;
+            flex-shrink: 0;
+            overflow-x: auto;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .excel-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44, 62, 80, 0.8);
+            z-index: 1;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ecf0f1;
+            border: none;
+            padding: 9px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            margin: 0 2px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-bright-green {
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.9), rgba(0, 204, 0, 0.9)) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+        }
+
+        .btn-light-green {
+            background: linear-gradient(135deg, rgba(169, 223, 191, 0.9), rgba(130, 224, 170, 0.9)) !important;
+            color: #000 !important;
+            font-weight: 700 !important;
+        }
+
+        .active-income {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.9), rgba(46, 204, 113, 0.9)) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
+        }
+
+        /* Cost column styling */
+        .cost-column {
+            background-color: rgba(255, 245, 245, 0.9);
+            border-left: 3px solid var(--cost-color);
+        }
+
+        .income-column {
+            background-color: rgba(245, 255, 245, 0.9);
+            border-left: 3px solid var(--income-color);
+        }
+
+        .cost-value {
+            color: var(--cost-color);
+            font-weight: 700;
+        }
+
+        .income-value {
+            color: var(--income-color);
+            font-weight: 700;
+        }
+
+        /* Print Styles */
+        @media print {
+            .excel-footer {
+                display: none;
+            }
+            
+            body {
+                padding: 0;
+                background: white !important;
+            }
+            
+            .table-container {
+                padding: 0;
+            }
+            
+            table {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            th, td {
+                border: 1px solid #000;
+                background: white !important;
+            }
+            
+            .app-wrapper {
+                background: white !important;
+                box-shadow: none !important;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 241, 241, 0.8);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(193, 193, 193, 0.8);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 168, 168, 0.8);
+        }
+
+        /* Data row highlighting */
+        .data-row:nth-child(even) {
+            background-color: rgba(252, 252, 252, 0.7);
+        }
+
+        .data-row:hover {
+            background-color: rgba(240, 247, 255, 0.9);
+        }
+
+        /* Progress bar for achievement column */
+        .achievement-cell {
+            position: relative;
+            padding-right: 40px;
+        }
+
+        .progress-bar {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: conic-gradient(var(--secondary) var(--progress), rgba(238, 238, 238, 0.8) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .progress-bar span {
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        /* Toggle switch for cost/income view */
+        .view-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, rgba(248, 249, 250, 0.9), rgba(233, 236, 239, 0.9));
+            border-radius: 8px;
+            border: 1px solid rgba(238, 238, 238, 0.7);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+                url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .toggle-label {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 13px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.9), rgba(192, 57, 43, 0.9));
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.9), rgba(46, 204, 113, 0.9));
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .header-title h1 {
+                font-size: 22px;
+            }
+            
+            .header-subtitle {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            header {
+                padding: 15px 20px;
+            }
+            
+            .header-title h1 {
+                font-size: 20px;
+            }
+            
+            .header-subtitle {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-title h1 {
+                font-size: 18px;
+            }
+            
+            .header-subtitle {
+                font-size: 11px;
+            }
+            
+            .excel-footer {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            body {
+                background-attachment: scroll;
+            }
+        }
+
+        /* Table cell styles for better readability */
+        td:first-child {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .work-description {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        /* Construction-themed decorative elements */
+        .construction-pattern {
+            position: absolute;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Image loading fallback */
+        @supports not (backdrop-filter: blur(10px)) {
+            .table-responsive,
+            .nav-btn {
+                background: rgba(255, 255, 255, 0.95);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <header>
+            <div class="header-title">
+                <h1>Construction Project Dashboard</h1>
+                <div class="header-subtitle">Official Construction Project Monitoring System</div>
+            </div>
+        </header>
+        
+        <div class="table-container">
+            <div class="view-toggle">
+                <span class="toggle-label">Cost View:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="costViewToggle" onchange="toggleCostView()">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Income View</span>
+            </div>
+
+            <div class="table-responsive">
+                <table id="workTable">
+                    <thead>
+                        <tr>
+                            <th>Item No.</th>
+                            <th>Work Description</th>
+                            <th>Achievement</th>
+                            <th id="rate-header">Income (Birr)</th>
+                            <th id="total-header">Total Income (Birr)</th>
+                            <th>Status</th>
+                            <th class="cost-column" id="cost-header" style="display: none;">Cost (Birr)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="excel-footer">
+            <button class="nav-btn" onclick="switchTab('monthly')">
+                <span style="margin-right: 3px;">📅</span> Monthly
+            </button>
+            <button class="nav-btn btn-bright-green" onclick="switchTab('sos')">
+                <span style="margin-right: 3px;">⚠️</span> SOS
+            </button>
+            <button class="nav-btn btn-light-green" onclick="switchTab('comparison')">
+                <span style="margin-right: 3px;">📊</span> Comparison
+           
+            <button class="nav-btn" onclick="switchTab('payroll')">
+                <span style="margin-right: 3px;">💰</span> Payroll
+            </button>
+            <button class="nav-btn active-income" onclick="switchTab('income')">
+                <span style="margin-right: 3px;">💵</span> Income
+            </button>
+            <button class="nav-btn btn-danger" onclick="switchTab('cost-analysis')">
+                <span style="margin-right: 3px;">📉</span> Cost Analysis
+            </button>
+        </div>
+    </div>
+
+
+
+    <script>
+        // Sample data for the construction project with income and cost
+        const projectData = [
+            { 
+                itemNo: "1.12.8", 
+                description: "Allow for supplying temporary electricity, water, telephone and other utility bills for the supervisor's and contractor's including connection, distribution system for the work, internal arrangements and all payment to the authorities for connections. it is the responsibility of the contractor to ensure steady and uninterrupted power supply to work", 
+                achievement: 0.72 , 
+                rate: "12611839.0740741", 
+                total: "9141575.07295305", 
+                cost: "100,000",
+                status: "Completed" 
+            },
+            { 
+                itemNo: "1.13.3", 
+                description: "Provisions of security", 
+                achievement: 0.72, 
+                rate: "1967074.06416667", 
+                total: "1425815.46702017", 
+                cost: "280,000",
+                status: "Completed" 
+            },
+            { 
+                itemNo: 1.12, 
+                description: "Allow for expenses required for conducting compensation payment estimation such as periderm for Committee, fuel cost, printing expenses and other related expenses. Payment shall be paid up on approval of the Engineer keeping all legal procedures. The costs will be reimbursed to the contractor after receiving the original invoice in the payment certificate by the Consultant", 
+                achievement: 0.12, 
+                rate: "500,000", 
+                total: "425,000", 
+                cost: "350,000",
+                status: "In Progress" 
+            },
+            { 
+                itemNo: "3.A.1", 
+                description: "Mobilization and Demoblization", 
+                achievement: 0.5, 
+                rate: "585579.3", 
+                total: "292789.65", 
+                cost: "168,000",
+                status: "In Progress" 
+            },
+            { 
+                itemNo: "2.3.1", 
+                description: "Fill and compaction the Core zone with clay material with max hauling distance of 5 Km", 
+                achievement: 29479.5, 
+                rate: "289.46", 
+                total: "8533136.07", 
+                cost: "121,000",
+                status: "In Progress" 
+            },
+            { 
+                itemNo: "2.4.1", 
+                description: "Fill and compaction the Shell zone with selected material, max hauling distance of 5 Km", 
+                achievement: 43277.3, 
+                rate: "260.94", 
+                total: "11292778.662", 
+                cost: "72,000",
+                status: "In Progress" 
+            },
+            { 
+                itemNo: "2.5.1", 
+                description: "Filter material (Finer) supply and fill(zone 2A)", 
+                achievement: 6643.13, 
+                rate: "1232.8", 
+                total: "8189650.664", 
+                cost: "96,000",
+                status: "Started" 
+            },
+            { 
+                itemNo: "2.5.2", 
+                description: "Filter material (coarser) supply and fill(zone 2B)", 
+                achievement: 3020, 
+                rate: "1235.05", 
+                total: "3729851", 
+                cost: "36,000",
+                status: "Started" 
+            },
+            { 
+                itemNo: "2.5.4", 
+                description: "Riprap(zone 5)", 
+                achievement: 2329.54, 
+                rate: "811.59", 
+                total: "1890631.3686", 
+                cost: "14,400",
+                status: "Started" 
+            },
+            { 
+                itemNo: "2.6.1", 
+                description: "Fill and compaction  zone 4 with Rock material  ", 
+                achievement:48677.76, 
+                rate: "849.82", 
+                total: "41367334.0032", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "2.9.4", 
+                description: "Vibrating Wire Piezometer with its complete accessories in embankment ", 
+                achievement:3, 
+                rate: "187200", 
+                total: "561600", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "2.9.5", 
+                description: " Vibrating Wire settlement sensor with complete accessories", 
+                achievement:2, 
+                rate: "117000", 
+                total: "41367334.0032", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "2.9.8", 
+                description: "Vibrating wire cable. ", 
+                achievement:307.94, 
+                rate: "936", 
+                total: "288231.84", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "4.2.4", 
+                description: "Base slab ", 
+                achievement:3.17, 
+                rate: "5152.98", 
+                total: "16324.64064", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "2.6.1", 
+                description: "Fill and compaction  zone 4 with Rock material  ", 
+                achievement:48677.76, 
+                rate: "849.82", 
+                total: "41367334.0032", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "8.5.1", 
+                description: " C-25 concrete work including formwork ", 
+                achievement:8.5, 
+                rate: "5365", 
+                total: "45602.5", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "8.5.3", 
+                description: " Reinforcement bars (bending, cutting& placing) ", 
+                achievement:48677.76, 
+                rate: "278.7", 
+                total: "19046.358 ", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+             { 
+                itemNo: "11.7.1", 
+                description: "Ordinery soil excavation ", 
+                achievement:156.6, 
+                rate: "82.6", 
+                total: "12935.16", 
+                cost: "3,600",
+                status: "Pending" 
+            },                        
+            { 
+                itemNo: "11.7.2", 
+                description: "Basaltic or equivalent stone masonery work in cement sand mortar of 1:3 mix ratio", 
+                achievement:404.811, 
+                rate: "2302.55", 
+                total: "932097.56805", 
+                cost: "3,600",
+                status: "Pending" 
+            },                         
+            { 
+                itemNo: "11.7.3", 
+                description: "C-25 concrete mixing,placing,vibrating and curing for slab including formwork ", 
+                achievement:32.8, 
+                rate: "82.6", 
+                total: "194254.72", 
+                cost: "3,600",
+                status: "Pending" 
+            },                         
+            { 
+                itemNo: "11.7.4", 
+                description: " Reinforcement bars of  ø10mm as specified on the drawings with 150mm spacing", 
+                achievement:156.6, 
+                rate: "68.34", 
+                total: "103830.3288", 
+                cost: "3,600",
+                status: "Pending" 
+            },                         
+            { 
+                itemNo: "New", 
+                description: "Reinforcement bar of Dia 12mm as specified on the drawing with 200mm spacing ", 
+                achievement:3663.2, 
+                rate: "3663.2", 
+                total: "250343.088", 
+                cost: "3,600",
+                status: "Pending" 
+            },                         
+            { 
+                itemNo: "11.7.6", 
+                description: "cart away excavated material ", 
+                achievement:96, 
+                rate: "44.84", 
+                total: "4304.64", 
+                cost: "3,600",
+                status: "Pending" 
+            },
+            { 
+                itemNo: "11.7.8", 
+                description: " back Fill with shell material around the ditch", 
+                achievement:480, 
+                rate: "178.34", 
+                total: "85603.2", 
+                cost: "3,600",
+                status: "Pending" 
+            }
+        ];
+
+        // Variables to track current view
+        let isCostViewVisible = false;
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return amount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Function to get status class
+        function getStatusClass(status) {
+            switch(status.toLowerCase()) {
+                case 'completed': return 'status-completed';
+                case 'in progress': return 'status-active';
+                case 'started': return 'status-started';
+                case 'pending': return 'status-pending';
+                default: return 'status-pending';
+            }
+        }
+
+        // Function to create progress bar HTML
+        function createProgressBar(percentage) {
+            const progress = (percentage / 100) * 360; // Convert to degrees for conic gradient
+            return `
+                <div class="achievement-cell">
+                    ${percentage}%
+                    <div class="progress-bar" style="--progress: ${progress}deg">
+                        <span>${percentage}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to load data into the table
+        function loadProjectData() {
+            const tableBody = document.getElementById("table-body");
+            
+            // Clear existing rows
+            tableBody.innerHTML = '';
+            
+            // Add data rows
+            projectData.forEach(item => {
+                const row = document.createElement("tr");
+                row.className = "data-row";
+                
+                // Remove commas and calculate values
+                const incomeValue = parseFloat(item.total.replace(/,/g, ''));
+                const costValue = parseFloat(item.cost.replace(/,/g, ''));
+                
+                row.innerHTML = `
+                    <td><strong>${item.itemNo}</strong></td>
+                    <td class="work-description">${item.description}</td>
+                    <td>${createProgressBar(item.achievement)}</td>
+                    <td class="income-column"><strong>${formatCurrency(parseFloat(item.rate.replace(/,/g, '')))} Birr</strong></td>
+                    <td class="income-value"><strong>${formatCurrency(incomeValue)} Birr</strong></td>
+                    <td><span class="badge ${getStatusClass(item.status)}">${item.status}</span></td>
+                    ${isCostViewVisible ? `<td class="cost-column cost-value"><strong>${formatCurrency(costValue)} Birr</strong></td>` : ''}
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to toggle cost view
+        function toggleCostView() {
+            const toggle = document.getElementById("costViewToggle");
+            const costHeader = document.getElementById("cost-header");
+            const rateHeader = document.getElementById("rate-header");
+            const totalHeader = document.getElementById("total-header");
+            
+            isCostViewVisible = toggle.checked;
+            
+            // Show/hide cost column
+            if (isCostViewVisible) {
+                costHeader.style.display = "table-cell";
+                rateHeader.textContent = "Income (Birr)";
+                totalHeader.textContent = "Total Income (Birr)";
+            } else {
+                costHeader.style.display = "none";
+                rateHeader.textContent = "Income (Birr)";
+                totalHeader.textContent = "Total Income (Birr)";
+            }
+            
+            // Reload data to update the table
+            loadProjectData();
+        }
+
+        // Function to switch between tabs
+        function switchTab(tabName) {
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active-income');
+                btn.classList.remove('btn-danger');
+            });
+            
+            // Add active class to clicked button
+            const activeBtn = document.querySelector(`.nav-btn[onclick*="${tabName}"]`);
+            if (activeBtn) {
+                if (tabName === 'cost-analysis') {
+                    activeBtn.classList.add('btn-danger');
+                } else if (tabName === 'income') {
+                    activeBtn.classList.add('active-income');
+                }
+            }
+            
+            // Show alert for other tabs (demo purposes)
+            const tabNames = {
+                'monthly': 'Monthly Report',
+                'sos': 'SOS Report',
+                'comparison': 'Comparison View',
+                'perdam': 'Perdam Analysis',
+                'payroll': 'Payroll Details',
+                'income': 'Income Report',
+                'cost-analysis': 'Cost Analysis Report'
+            };
+            
+            alert(`Loading ${tabNames[tabName]} - This is a demo. In a real application, this would load different data.`);
+        }
+
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjectData();
+            
+            // Add keyboard shortcuts for cost view toggle
+            document.addEventListener('keydown', function(event) {
+                // Ctrl+C for cost view
+                if (event.ctrlKey && event.key === 'c') {
+                    event.preventDefault();
+                    const toggle = document.getElementById("costViewToggle");
+                    toggle.checked = !toggle.checked;
+                    toggleCostView();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
